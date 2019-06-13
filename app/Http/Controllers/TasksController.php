@@ -45,9 +45,15 @@ class TasksController extends Controller
         
         $task = new Task;
         
-        return view('tasks.create', [
-            'task' => $task,
-        ]);
+        if (\Auth::check()) {
+            return view('tasks.create', [
+                'task' => $task,
+            ]);
+        }
+        
+        else {
+            return redirect('login');
+        }
     }
 
     /**
@@ -134,9 +140,12 @@ class TasksController extends Controller
         ]);
         
         $task = Task::find($id);
-        $task->status = $request->status;
-        $task->content = $request->content;
-        $task->save();
+        
+        if (\Auth::id() === $task->user_id) {
+            $task->status = $request->status;
+            $task->content = $request->content;
+            $task->save();
+        }
         
         return redirect('/');
     }
